@@ -5,7 +5,7 @@ let bench_positive_home = "../../../test/inputs/positive"
 let bench_negative_home = "../../../test/inputs/negative"
 
 let pos_parse_test filename =
-  let filename = Caml.Filename.concat bench_positive_home filename in
+  let filename = Stdlib.Filename.concat bench_positive_home filename in
   Fmt.(pf stdout "TEST: %s@." filename);
   let parsed = Parser.sexp_parse filename in
   try
@@ -17,7 +17,7 @@ let pos_parse_test filename =
 ;;
 
 let neg_parse_test filename =
-  let filename = Caml.Filename.concat bench_negative_home filename in
+  let filename = Stdlib.Filename.concat bench_negative_home filename in
   Fmt.(pf stdout "TEST: %s@." filename);
   try
     let parsed = Parser.sexp_parse filename in
@@ -30,11 +30,11 @@ let neg_parse_test filename =
 ;;
 
 let benchfiles_pos =
-  Array.filter ~f:Sygus.has_standard_extension (Caml.Sys.readdir bench_positive_home)
+  Array.filter ~f:Sygus.has_standard_extension (Stdlib.Sys.readdir bench_positive_home)
 ;;
 
 let benchfiles_neg =
-  Array.filter ~f:Sygus.has_standard_extension (Caml.Sys.readdir bench_negative_home)
+  Array.filter ~f:Sygus.has_standard_extension (Stdlib.Sys.readdir bench_negative_home)
 (* dune test runs in _build/default/test.  *)
 ;;
 

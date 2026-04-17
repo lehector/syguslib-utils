@@ -128,7 +128,7 @@ let attributes_of_sexps (sl : Annot.t list) : (attribute list, location * string
 let index_of_asexp (s : Annot.t) : index =
   match s.sexp with
   | AAtom a ->
-    (match Caml.int_of_string_opt a with
+    (match Stdlib.int_of_string_opt a with
     | Some i -> mk_index_num ~loc:s.loc i
     | None -> mk_index_sym ~loc:s.loc a)
   | _ -> raise_parse_error s "Not an index"
@@ -184,10 +184,10 @@ let literal_of_string ?(loc = dummy_loc) (s : string) : literal =
     | "true" -> mk_lit_bool ~loc true
     | "false" -> mk_lit_bool ~loc false
     | _ ->
-      (match Caml.int_of_string_opt s with
+      (match Stdlib.int_of_string_opt s with
       | Some i -> mk_lit_num ~loc i
       | None ->
-        (match Caml.float_of_string_opt s with
+        (match Stdlib.float_of_string_opt s with
         | Some f -> mk_lit_dec ~loc f
         | None -> raise_parse_error (Annot.mk_atom loc s) "Not a literal.")))
 ;;

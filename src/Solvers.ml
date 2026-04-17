@@ -65,7 +65,7 @@ type solver_instance =
   }
 
 let online_solvers : (int * solver_instance) list ref = ref []
-let mk_tmp_sl prefix = Caml.Filename.temp_file prefix ".sl"
+let mk_tmp_sl prefix = Stdlib.Filename.temp_file prefix ".sl"
 
 let commands_to_file (commands : program) (filename : string) =
   let out_chan = OC.create filename in
@@ -97,8 +97,8 @@ struct
     let using_cvc5 = Config.using_cvc5 () in
     match x with
     | CVC -> if using_cvc5 then "cvc5" else "cvc4"
-    | DryadSynth -> Caml.Filename.basename (Config.dryadsynth_binary_path ())
-    | EUSolver -> Caml.Filename.basename (Config.eusolver_binary_path ())
+    | DryadSynth -> Stdlib.Filename.basename (Config.dryadsynth_binary_path ())
+    | EUSolver -> Stdlib.Filename.basename (Config.eusolver_binary_path ())
   ;;
 
   let sname = function
@@ -236,7 +236,7 @@ struct
   module CoreSolver = SygusSolver (Stats) (Log) (Config)
 
   let kill_solver (pid : int) =
-    try Unix.kill pid Caml.Sys.sigkill with
+    try Unix.kill pid Stdlib.Sys.sigkill with
     | _ -> ()
   ;;
 
