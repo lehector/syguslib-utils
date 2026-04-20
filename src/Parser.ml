@@ -158,7 +158,7 @@ and identifier_of_asexp (s : Annot.t) : identifier =
       (List.map ~f:index_of_asexp (i0 :: indexes))
   | AList [ { sexp = AAtom "as"; _ }; main_s; sort_s ] ->
     mk_id_qual ~loc:s.loc (symbol_of_asexp main_s) (sygus_sort_of_asexp sort_s)
-  | _ -> raise_parse_error s "Not an identifier."
+  | _ -> raise_parse_error s ("Not an identifier. In " ^ (Sexp.to_string_hum (Annot.to_sexp s)))
 ;;
 
 let sorted_var_of_asexp (s : Annot.t) : sorted_var =
