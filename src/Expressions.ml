@@ -46,8 +46,8 @@ let bvadd e1 e2 = mk_t_app (mk_id_simple "bvadd") [e1; e2]
 let bvmul e1 e2 = mk_t_app (mk_id_simple "bvmul") [e1; e2]
 let bvudiv e1 e2 = mk_t_app (mk_id_simple "bvudiv") [e1; e2]
 let bvurem e1 e2 = mk_t_app (mk_id_simple "bvurem") [e1; e2]
-let bvsdiv e1 e2 = mk_t_app (mk_id_simple "bvurem") [e1; e2]
-let bvsrem e1 e2 = mk_t_app (mk_id_simple "bvurem") [e1; e2]
+let bvsdiv e1 e2 = mk_t_app (mk_id_simple "bvsdiv") [e1; e2]
+let bvsrem e1 e2 = mk_t_app (mk_id_simple "bvsrem") [e1; e2]
 let bvshl e1 e2 = mk_t_app (mk_id_simple "bvshl") [e1; e2]
 let bvlshr e1 e2 = mk_t_app (mk_id_simple "bvlshr") [e1; e2]
 let bvashr e1 e2 = mk_t_app (mk_id_simple "bvashr") [e1; e2]
@@ -59,8 +59,8 @@ let bvslt e1 e2 = mk_t_app (mk_id_simple "bvslt") [e1; e2]
 let bvsle e1 e2 = mk_t_app (mk_id_simple "bvsle") [e1; e2]
 let bvsgt e1 e2 = mk_t_app (mk_id_simple "bvsgt") [e1; e2]
 let bvsge e1 e2 = mk_t_app (mk_id_simple "bvsge") [e1; e2]
-let bvrotr i e1 = mk_t_app (mk_id_indexed "rotate_left" [i]) [e1]
-let bvrotl i e1 = mk_t_app (mk_id_indexed "rotate_right" [i]) [e1]
+let bvrotr i e1 = mk_t_app (mk_id_indexed "rotate_right" [i]) [e1]
+let bvrotl i e1 = mk_t_app (mk_id_indexed "rotate_left" [i]) [e1]
 
 let clz width x = if width < 1 then raise (Invalid_argument "width needs to be at least 1") else
   let gen_hex i = list_by_index (fun i' -> (Stdlib.(=) i i')) width in
@@ -104,4 +104,4 @@ let width_of_bv = function
   | SId (_, IdIndexed (_, sym, [index])) -> if Stdlib.(=) sym "BitVec" then (match index with
     | INum (_ , width) -> width
     | _ -> raise (Invalid_argument "expected index to be an integer")) else raise (Invalid_argument "symbol was not 'BitVector'")
-  | _ -> raise (Invalid_argument "not a bitvector")
+  | _ -> raise (Invalid_argument "symbol was not 'BitVector'")
