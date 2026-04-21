@@ -1,5 +1,5 @@
 open Sygus
-open Utils
+open Base
 
 (* ============================================================================================= *)
 (*                                      SHORT FORM EXPRESSIONS                                   *)
@@ -62,22 +62,22 @@ let bvsge e1 e2 = mk_t_app (mk_id_simple "bvsge") [e1; e2]
 let bvrotr i e1 = mk_t_app (mk_id_indexed "rotate_right" [i]) [e1]
 let bvrotl i e1 = mk_t_app (mk_id_indexed "rotate_left" [i]) [e1]
 
-let clz width x = if width < 1 then raise (Invalid_argument "width needs to be at least 1") else
-  let gen_hex i = list_by_index (fun i' -> (Stdlib.(=) i i')) width in
-  (ite (bvuge x (gen_hex (Stdlib.(-) width 1) |> mk_bin)) (mk_bin (list_by_index (fun i -> Stdlib.(=) i 0) width)) (let (_, out) = f_iter (fun (i', expr) -> if Stdlib.(=) i' 0 then (i', width |> mk_num) else
-    ((Stdlib.(-) i' 1), (ite (bvuge x (gen_hex (Stdlib.(-) (Stdlib.(-) width 1) i') |> mk_bin)) (i' |> mk_num) expr))) width (width, width |> mk_num) in out ))
+let clz (width: int) x = if width < 1 then raise (Invalid_argument "width needs to be at least 1") else
+  let gen_hex i = List.init width ~f:(fun i' -> (Stdlib.(=) i i')) in
+  let f = (fun (i', expr) -> if Stdlib.(=) i' 0 then (i', width |> mk_num) else ((Stdlib.(-) i' 1), (ite (bvuge x (gen_hex (Stdlib.(-) (Stdlib.(-) width 1) i') |> mk_bin)) (i' |> mk_num) expr))) in
+  let out = Fn.apply_n_times ~n:width f (width, mk_num width) |> snd in
+  ite (bvuge x (gen_hex (Stdlib.(-) width 1) |> mk_bin)) (mk_bin (List.init width ~f:(fun i -> Stdlib.(=) i 0))) out
 
 let clo width x = clz width (bvnot x)
 
-let cls width x = ite (bvsle x (mk_bin (list_by_index (fun i -> Stdlib.(=) i (Stdlib.(-) width 1)) width))) (clo width x) (clz width x)
+let cls width x = ite (bvsle x (mk_bin (List.init width ~f:(fun i -> Stdlib.(=) i (Stdlib.(-) width 1))))) (clo width x) (clz width x)
 
 let popcnt width x = if width < 1 then raise (Invalid_argument "width needs to be at least 1") else
-    let (_, out) = f_iter (fun (i, expr) -> (Stdlib.(+) i 1, bvadd expr (zero_extend (mk_index_num (Stdlib.(-) width 1)) (extract (mk_index_num i) (mk_index_num i) x)))) width (0, mk_num 0) in
-      out
+  Fn.apply_n_times ~n:width (fun (i, expr) -> (Stdlib.(+) i 1, bvadd expr (zero_extend (mk_index_num (Stdlib.(-) width 1)) (extract (mk_index_num i) (mk_index_num i) x)))) (0, mk_num 0) |> snd
 
-let bvrev width x = if Stdlib.(=) (width mod 2) 1 then (raise (Invalid_argument "width needs to be even")) else
-  let (_, out) = f_iter (fun (i, expr) -> ((Stdlib.(-) i 1), (if (Stdlib.(=) i width) then expr else concat (extract (mk_index_num (Stdlib.(-) i 1)) (mk_index_num (Stdlib.(-) i 1)) x) expr)))
-    width (width, extract (mk_index_num (Stdlib.(-) width 1)) (mk_index_num (Stdlib.(-) width 1)) x) in out
+let bvrev width x = if Stdlib.(=) (width % 2) 1 then (raise (Invalid_argument "width needs to be even")) else
+  Fn.apply_n_times ~n:width (fun (i, expr) -> ((Stdlib.(-) i 1), (if (Stdlib.(=) i width) then expr else concat (extract (mk_index_num (Stdlib.(-) i 1)) (mk_index_num (Stdlib.(-) i 1)) x) expr)))
+    (width, extract (mk_index_num (Stdlib.(-) width 1)) (mk_index_num (Stdlib.(-) width 1)) x) |> snd
 
 (* Comparisons *)
 let ( > ) e1 e2 = mk_t_app (mk_id_simple ">") [ e1; e2 ]
