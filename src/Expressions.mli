@@ -154,6 +154,12 @@ val bvsgt : sygus_term -> sygus_term -> sygus_term
 (** compare two bitvectors by signed greater than or equal *)
 val bvsge : sygus_term -> sygus_term -> sygus_term
 
+(** rotate a bitvector left by index bits *)
+val bvrotl : index -> sygus_term -> sygus_term
+
+(** rotate a bitvector right by index bits*)
+val bvrotr : index -> sygus_term -> sygus_term
+
 (** Non-standard, but useful bit manipulation macros. *)
 
 (** count-leading-zeros macro. requires the width of the bitvector as first argument. *)
