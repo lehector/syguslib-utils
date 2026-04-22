@@ -12,7 +12,7 @@ let int x = mk_t_lit (mk_lit_num x)
 let real f = mk_t_lit (mk_lit_dec f)
 let hex x = mk_t_lit (mk_lit_hex x)
 let hex_of_int width x = if width % 4 <> 0 then raise (Invalid_argument ("width (" ^ (Int.to_string width) ^ ") needs to be a multiple of 4")) 
-  else Printf.sprintf ("%0*x") (width / 4) x |> hex
+  else Fmt.str ("%0*x") (width / 4) x |> hex
 
 (* If-then-else *)
 let ite a b c = mk_t_app (mk_id_simple "ite") [ a; b; c ]
