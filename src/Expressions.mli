@@ -19,6 +19,9 @@ val real : float -> sygus_term
 (** Create a hex constant given its string representation. *)
 val hex : string -> sygus_term
 
+(** Create a hex constant given a desired width (in bits) and its integer value. Requires width to be a multiple of 4 *)
+val hex_of_int : int -> int -> sygus_term
+
 (* If-then-else *)
 
 (** Create a conditional given the condition, then-branch and else-branch expressions.  *)
