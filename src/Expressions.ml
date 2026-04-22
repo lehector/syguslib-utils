@@ -64,28 +64,30 @@ let bvsge e1 e2 = mk_t_app (mk_id_simple "bvsge") [e1; e2]
 let bvrotr i e1 = mk_t_app (mk_id_indexed "rotate_right" [i]) [e1]
 let bvrotl i e1 = mk_t_app (mk_id_indexed "rotate_left" [i]) [e1]
 
-let clz (width: int) x = if width < 1 then raise (Invalid_argument "width needs to be at least 1") else
-  let gen_bin i = List.init width ~f:(fun i' -> (Stdlib.(=) i i')) in
-  let f = (fun (i', expr) -> ((Stdlib.(+) i' 1), (ite (bvuge x (gen_bin (Stdlib.(-) (Stdlib.(-) width 1) i') |> mk_bin)) (hex_of_int width (Stdlib.(-) (Stdlib.(-) width 1) i')) expr))) in
-  Fn.apply_n_times ~n:width f (0, hex_of_int width width) |> snd
-
-let clo width x = clz width (bvnot x)
-
-let cls width x = ite (bvsle x (mk_bin (List.init width ~f:(fun i -> Stdlib.(=) i (Stdlib.(-) width 1))))) (clo width x) (clz width x)
-
-let popcnt width x = if width < 1 then raise (Invalid_argument "width needs to be at least 1") else
-  Fn.apply_n_times ~n:width (fun (i, expr) -> (Stdlib.(+) i 1, bvadd expr (zero_extend (mk_index_num (Stdlib.(-) width 1)) (extract (mk_index_num i) (mk_index_num i) x)))) (0, hex_of_int width 0) |> snd
-
-let bvrev width x = if Stdlib.(=) (width % 2) 1 then (raise (Invalid_argument "width needs to be even")) else
-  Fn.apply_n_times ~n:width (fun (i, expr) -> ((Stdlib.(-) i 1), (if (Stdlib.(=) i width) then expr else concat (extract (mk_index_num (Stdlib.(-) i 1)) (mk_index_num (Stdlib.(-) i 1)) x) expr)))
-    (width, extract (mk_index_num (Stdlib.(-) width 1)) (mk_index_num (Stdlib.(-) width 1)) x) |> snd
-
 (* Comparisons *)
 let ( > ) e1 e2 = mk_t_app (mk_id_simple ">") [ e1; e2 ]
 let ( >= ) e1 e2 = mk_t_app (mk_id_simple ">=") [ e1; e2 ]
 let ( < ) e1 e2 = mk_t_app (mk_id_simple ">") [ e1; e2 ]
 let ( <= ) e1 e2 = mk_t_app (mk_id_simple "<=") [ e1; e2 ]
 let ( = ) e1 e2 = mk_t_app (mk_id_simple "=") [ e1; e2 ]
+
+(* Macros *)
+
+let clz (width: int) x = if Stdlib.(<) width 1 then raise (Invalid_argument "width needs to be at least 1") else
+  let gen_bin i = List.init width ~f:(fun i' -> (Stdlib.(=) i i')) in
+  let f = (fun (i', expr) -> ((Stdlib.(+) i' 1), (ite (bvuge x (gen_bin (Stdlib.(-) (Stdlib.(-) width 1) i') |> mk_bin)) (hex_of_int width (Stdlib.(-) (Stdlib.(-) width 1) i')) expr))) in
+  Fn.apply_n_times ~n:width f (0, hex_of_int width width) |> snd
+
+let clo width x = clz width (bvnot x)
+
+let cls width x = let sign_bit = (mk_index_num (Stdlib.(-) width 1)) in ite ((extract sign_bit sign_bit x) = (mk_bin [true])) (clo width x) (clz width x)
+
+let popcnt width x = if Stdlib.(<) width 1 then raise (Invalid_argument "width needs to be at least 1") else
+  Fn.apply_n_times ~n:width (fun (i, expr) -> (Stdlib.(+) i 1, bvadd expr (zero_extend (mk_index_num (Stdlib.(-) width 1)) (extract (mk_index_num i) (mk_index_num i) x)))) (0, hex_of_int width 0) |> snd
+
+let bvrev width x = if Stdlib.(=) (width % 2) 1 then (raise (Invalid_argument "width needs to be even")) else
+  Fn.apply_n_times ~n:width (fun (i, expr) -> ((Stdlib.(-) i 1), (if (Stdlib.(=) i width) then expr else concat (extract (mk_index_num (Stdlib.(-) i 1)) (mk_index_num (Stdlib.(-) i 1)) x) expr)))
+    (width, extract (mk_index_num (Stdlib.(-) width 1)) (mk_index_num (Stdlib.(-) width 1)) x) |> snd
 
 (* Grmmar *)
 let gconst sort = mk_g_constant sort
