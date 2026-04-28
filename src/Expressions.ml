@@ -106,5 +106,5 @@ let bv_sort width = mk_sort (mk_id_indexed (mk_symbol "BitVec") [mk_index_num wi
 let width_of_bv = function
   | SId (_, IdIndexed (_, sym, [index])) -> if Stdlib.(=) sym "BitVec" then (match index with
     | INum (_ , width) -> width
-    | _ -> raise (Invalid_argument "expected index to be an integer")) else raise (Invalid_argument "symbol was not 'BitVector'")
-  | _ -> raise (Invalid_argument "symbol was not 'BitVector'")
+    | _ -> raise (Invalid_argument "expected index to be an integer")) else raise (Invalid_argument "symbol was not 'BitVec'")
+  | _ -> raise (Invalid_argument "symbol was not 'BitVec'")
